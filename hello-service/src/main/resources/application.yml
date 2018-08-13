@@ -1,0 +1,54 @@
+
+# setting port to 0 to force a random port assignment from discovery server won't work for multiple node clustering
+#server:
+#    port: 0  # to force a random port, so multiple app runtime can boot up to register to spring cloud server
+
+# Have to set eurkea.instance.instanceId. Otherwise with port=0 eureka will think it is one instance.
+
+## run without profile
+---
+spring:
+    application:
+        name: hello-service
+server:
+    port: 8091
+eureka:
+    instance:
+        hostname: localhost
+    client:
+        serviceUrl:
+            defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+## run in 2 node cluster with 2 profiles
+#
+---
+spring:
+    application:
+        name: hello-service
+    profile: svc1
+server:
+    port: 8091
+eureka:
+#    instance:
+#        hostname: svc1
+    client:
+        serviceUrl:
+            defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+#            defaultZone: ${EUREKA_URI:http://localhost:8000/eureka,http://localhost:8001/eureka,http://localhost:8002/eureka}
+---
+spring:
+    application:
+        name: hello-service
+    profiles: svc2
+server:
+    port: 8092
+eureka:
+#    instance:
+#        hostname: svc2
+    client:
+        serviceUrl:
+            defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+#            defaultZone: http://peer2:8001/eureka/,http://peer3:8002/eureka/
+
+
+

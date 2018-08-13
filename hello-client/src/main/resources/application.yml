@@ -1,0 +1,16 @@
+
+# setting port to 0 for discovery server for a random number doesn't work with node clustering
+server:
+#    port: 0  # to force a random port, so multiple app runtime can boot up to register to spring cloud server
+    port: 8191
+
+# enable Feign Hystrix, default is disabled
+feign:
+    hystrix:
+        enabled: true
+
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+#            defaultZone: ${EUREKA_URI:http://localhost:8000/eureka,http://localhost:8001/eureka,http://localhost:8002/eureka}

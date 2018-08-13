@@ -1,0 +1,84 @@
+#eureka.client.register-with-eureka=false
+#eureka.client.fetch-registry=false
+
+#logging.level.com.netflix.eureka=OFF
+#logging.level.com.netflix.discovery=OFF
+
+
+######
+
+# to run single node service discovery server
+# ./gradlew bootRun
+# or
+# ./gradlew assemble
+# cd build/libs
+# java -jar eureka-service-0.0.1-SNAPSHOT.jar
+
+---
+spring:
+    application:
+        name: eureka-service
+server:
+    port: 8761  # default server port
+# 在默认情况下erureka server也是一个eureka client ,必须要指定一个 server
+eureka:
+    instance:
+        hostname: localhost
+    client:
+        # 通过eureka.client.registerWithEureka：false 和 fetchRegistry：false来表明自己是一个eureka server
+        registerWithEureka: false
+        fetchRegistry: false
+        serviceUrl:
+            defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+
+######
+
+# to run 3 node service discovery cluster
+#
+# run 3 nodes with 3 profiles:
+#  gradle assemble
+#
+#  java -jar eureka-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=peer1
+#  java -jar eureka-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=peer2
+#  java -jar eureka-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=peer3
+
+---
+spring:
+    application:
+        name: eureka-service
+    profiles: peer1
+server:
+    port: 8000
+eureka:
+    instance:
+        hostname: peer1
+    client:
+        serviceUrl:
+            defaultZone: http://peer2:8001/eureka/,http://peer3:8002/eureka/
+---
+spring:
+    application:
+        name: eureka-service
+    profiles: peer2
+server:
+    port: 8001
+eureka:
+    instance:
+        hostname: peer2
+    client:
+        serviceUrl:
+            defaultZone: http://peer1:8000/eureka/,http://peer3:8002/eureka/
+---
+spring:
+    application:
+        name: eureka-service
+    profiles: peer3
+server:
+    port: 8002
+eureka:
+    instance:
+        hostname: peer3
+    client:
+        serviceUrl:
+            defaultZone: http://peer1:8000/eureka/,http://peer2:8001/eureka/
